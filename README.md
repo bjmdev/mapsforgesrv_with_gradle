@@ -30,6 +30,7 @@ Command parameters:
 		with "-if all" its useful to run on a server. raspberry runs nice.
 	5. -l  preffered language if availible in the map file
     6. -s  when using a themefile, selecting the style
+    7. -h  print the help text and terminate
 
 longest example:
 ```console
