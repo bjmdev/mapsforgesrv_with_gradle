@@ -9,6 +9,9 @@ The tiles are rendered every time on-the fly when requested
 The description of this tool you find at the orign page:
 https://sourceforge.net/p/mobac/code/HEAD/tree/trunk/tools/MapsforgeSrv/
 
+An example how to use the tile server on client side, you find eg at qmapshack project:
+https://github.com/Maproom/qmapshack/wiki/DocBasicsMapDem#mapsforge-maps
+
 Whats different to the orign?
 
 	1. mapsforge libs updated from 0.6.0 to 0.13.0
