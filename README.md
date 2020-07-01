@@ -42,8 +42,8 @@ C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2
 
 -------------
 ### Contributors
-- r_x https://sourceforge.net/projects/mobac/
-- Thomas Th. @telemaxx
+- r_x created this tile server as part of mobac project https://sourceforge.net/projects/mobac/
+- Thomas Th. @telemaxx: converted the mapserver server part in own git project with gradle nature.
 - @pingurus (fixing styleseets error)
 - Bernd @bjmdev (multi map support)
 - @JFritzle (selectable theme style)
