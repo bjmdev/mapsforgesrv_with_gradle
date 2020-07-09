@@ -22,7 +22,7 @@ Whats different to the orign?
 	6. interface selection(optional) -if [all,localhost]
 	7. language selection(optional) -l EN
     8. seletable style: -s elmt-hiking
-    9. selectable overlays: -o elmt-hiking
+    9. selectable overlays: -o "elmt-mtbs_tracks,elmt-mtb_routes"
 	
 
 Command parameters:
