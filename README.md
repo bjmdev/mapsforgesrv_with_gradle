@@ -22,22 +22,24 @@ Whats different to the orign?
 	6. interface selection(optional) -if [all,localhost]
 	7. language selection(optional) -l EN
     8. seletable style: -s elmt-hiking
+    9. selectable overlays: -o elmt-hiking
 	
 
 Command parameters:
 
-	1. -m  path to the mapfile this is mandetorry
+	1. -m  path to the mapfile(s), at leas one file is mandetorry. comma-separated list of mapsforge map files (.map)
 	2. -t  path to the themefile. this is optional, without the internal theme is used
 	3. -p  port to listen. this is optional, without 8080 is used
 	4. -if interface listen on. this is optional, without localhost is used. possibilities -if all -if localhost
 		with "-if all" its useful to run on a server. raspberry runs nice.
 	5. -l  preffered language if availible in the map file
-    6. -s  when using a themefile, selecting the style
-    7. -h  print the help text and terminate
+    6. -s  when using a themefile, selecting the style. eg "elmt-hiking"
+    7. -o  when using a themefile and -o is given, ignore overlays enabled inside the themefile. Use only this comma-separated list of overlays.
+    8. -h  print the help text and terminate
 
 longest example:
 ```console
-C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2mapfile2.map" -t path2themefile.xml -p 8080 -if all -l EN -s "elmt-hiking"
+C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2mapfile2.map" -t path2themefile.xml -p 8080 -if all -l EN -s "elmt-hiking" "-o elmt-mtbs_tracks,elmt-mtb_routes,elmt-mtb_c_routes"
 ```
 
 -------------
@@ -46,5 +48,5 @@ C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2
 - Thomas Th. @telemaxx: converted the mapserver server part in own git project with gradle nature.
 - @pingurus (fixing styleseets error)
 - Bernd @bjmdev (multi map support)
-- @JFritzle (selectable theme style)
+- @JFritzle (selectable theme style and overlays)
 
