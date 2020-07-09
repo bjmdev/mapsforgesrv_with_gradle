@@ -1,4 +1,5 @@
 /*******************************************************************************
+ * Copyright 2016 r_x
  * Copyright 2019, 2020 Thomas Theussing and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -41,7 +42,6 @@ public class MapsforgeSrv {
 		String preferredLanguage = null;
 		final int DEFAULTPORT = 8080; 
 		String portNumberString = "" + DEFAULTPORT; //$NON-NLS-1$
-
 
 		Options options = new Options();
 

@@ -1,4 +1,5 @@
 /*******************************************************************************
+ * Copyright 2016 r_x
  * Copyright 2019, 2020 Thomas Theussing and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
