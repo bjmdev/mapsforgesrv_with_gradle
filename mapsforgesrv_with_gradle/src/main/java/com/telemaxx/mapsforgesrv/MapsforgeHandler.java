@@ -23,8 +23,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -79,7 +76,7 @@ public class MapsforgeHandler extends AbstractHandler {
 	protected final List<File> mapFiles;
 	protected final File themeFile;
 	protected final String themeFileStyle;
-	protected final File themePropFile;
+	protected final String[] themeFileOverlays;
 	protected final MultiMapDataStore multiMapDataStore;
 	protected final DisplayModel displayModel;
 	protected DatabaseRenderer renderer;
@@ -93,23 +90,15 @@ public class MapsforgeHandler extends AbstractHandler {
 
 	
 	public MapsforgeHandler(List<File> mapFiles, File themeFile) throws FileNotFoundException {
-		this(mapFiles, themeFile, (String)null, (String)null);
+		this(mapFiles, themeFile, (String)null, (String[])null, (String)null);
 	}
 
-	public MapsforgeHandler(List<File> mapFiles, File themeFile, String themeFileStyle, String preferredLanguage) throws FileNotFoundException {
+	public MapsforgeHandler(List<File> mapFiles, File themeFile, String themeFileStyle, String[] themeFileOverlays, String preferredLanguage) throws FileNotFoundException {
 		super();
 		this.mapFiles = mapFiles;
 		this.themeFile = themeFile;
 		this.themeFileStyle = themeFileStyle;
-		if (themeFile != null) {
-			if (themeFileStyle != null) {
-				themePropFile = new File(themeFile.getParentFile(), themeFile.getName() + "-" + themeFileStyle + ".prop"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				themePropFile = new File(themeFile.getParentFile(), themeFile.getName() + ".prop"); //$NON-NLS-1$
-			}
-		} else {
-			themePropFile = null;
-		}
+		this.themeFileOverlays = themeFileOverlays;
 
 		GraphicFactory graphicFactory = AwtGraphicFactory.INSTANCE;
 		multiMapDataStore = new MultiMapDataStore(MultiMapDataStore.DataPolicy.RETURN_ALL);
@@ -125,15 +114,6 @@ public class MapsforgeHandler extends AbstractHandler {
 			public Set<String> getCategories(XmlRenderThemeStyleMenu styleMenu) {
 				renderThemeStyleMenu = styleMenu;
 
-				Properties prop = new Properties();
-				if (themePropFile.isFile()) {
-					try (FileReader r = new FileReader(themePropFile)) {
-						prop.load(r);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-
 				String id = null;
 				renderThemeStyleMenu = styleMenu;
 				if (themeFileStyle != null) {
@@ -145,37 +125,24 @@ public class MapsforgeHandler extends AbstractHandler {
 				XmlRenderThemeStyleLayer baseLayer = styleMenu.getLayer(id);
 				Set<String> result = baseLayer.getCategories();
 				for (XmlRenderThemeStyleLayer overlay : baseLayer.getOverlays()) {
-					
-					String propValue = prop.getProperty(overlay.getId());
-					boolean overlayEnabled = overlay.isEnabled();
-					if (propValue != null) {
-						overlayEnabled = Boolean.parseBoolean(propValue);
+					String overlayId = overlay.getId();
+					boolean overlayEnabled = false;
+					if (themeFileOverlays == null) {
+						overlayEnabled = overlay.isEnabled();
+					} else {
+						for (int i = 0; i < themeFileOverlays.length; i++) {
+							if (themeFileOverlays[i].equals(overlayId))
+								overlayEnabled = true;
+						}
 					}
-					prop.setProperty(overlay.getId(), Boolean.toString(overlayEnabled));
-					
-					if (overlay.isEnabled()) {
+					System.out.println("Overlay id=\"" + overlayId + "\" enabled=\"" + Boolean.toString(overlayEnabled)
+							+ "\" title=\"" + overlay.getTitle(preferredLanguage) + "\"");
+										
+					if (overlayEnabled) {
 						result.addAll(overlay.getCategories());
 					}
 				}
 
-
-				try (FileWriter wr = new FileWriter(themePropFile)) {
-
-					Properties tmp = new Properties() {
-
-						private static final long serialVersionUID = 1L;
-
-						@Override
-						public synchronized Enumeration<Object> keys() {
-							return Collections.enumeration(new TreeSet<Object>(super.keySet()));
-						}
-					};
-					tmp.putAll(prop);
-					tmp.store(wr, "MapsforgeSrv theme properties file"); //$NON-NLS-1$
-					System.out.println("Saved enabled overlays to " + themePropFile); //$NON-NLS-1$
-				} catch (IOException e) {
-					LOG.error("Failed to save MapsforgeSrv theme properties file", e); //$NON-NLS-1$
-				}
 				return result;
 			}
 

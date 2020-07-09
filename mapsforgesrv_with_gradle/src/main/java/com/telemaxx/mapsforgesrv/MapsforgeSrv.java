@@ -15,6 +15,7 @@
  * 
  * changelog:
  * 0.13: selectable style
+ * 0.13.1: selectable overlays
  *******************************************************************************/
 
 package com.telemaxx.mapsforgesrv;
@@ -29,12 +30,14 @@ import org.eclipse.jetty.server.Server;
 public class MapsforgeSrv {
 
 	public static void main(String[] args) throws Exception {
-		final String VERSION = "0.13.0"; //starting with 0.13, the mapsforge version //$NON-NLS-1$
+		final String VERSION = "0.13.1"; //starting with 0.13, the mapsforge version //$NON-NLS-1$
 		System.out.println("MapsforgeSrv - a mapsforge tile server. " + "version: " + VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 
 		String[] mapFilePaths = null;
 		String themeFilePath = null;
 		String themeFileStyle = null;
+		String optionValue = null;
+		String[] themeFileOverlays = null;
 		String preferredLanguage = null;
 		final int DEFAULTPORT = 8080; 
 		String portNumberString = "" + DEFAULTPORT; //$NON-NLS-1$
@@ -52,7 +55,11 @@ public class MapsforgeSrv {
 		
 		Option themefileStyleArgument = new Option("s", "style", true, "style of the theme file(.xml), (default: default defined in xml file)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		themefileStyleArgument.setRequired(false);
-		options.addOption(themefileStyleArgument);		
+		options.addOption(themefileStyleArgument);	
+		
+		Option themefileOverlayArgument = new Option("o", "overlays", true, "comma-separated list of style\'s overlay ids of the theme file(.xml), (default: overlays enabled in xml file)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		themefileOverlayArgument.setRequired(false);
+		options.addOption(themefileOverlayArgument);
 
 		Option languageArgument = new Option("l", "language", true, "preferred language (default: native language)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		languageArgument.setRequired(false);
@@ -143,14 +150,23 @@ public class MapsforgeSrv {
 		if (themeFileStyle != null) {
 			themeFileStyle = themeFileStyle.trim();
 			System.out.println("selected ThemeStyle: " + themeFileStyle); //$NON-NLS-1$
-		}	
+		}
+		
+		optionValue = cmd.getOptionValue("overlays"); //$NON-NLS-1$
+		if (optionValue != null) {
+			themeFileOverlays = optionValue.trim().split(","); //$NON-NLS-1$
+			for (int i = 0; i < themeFileOverlays.length; i++) {
+				themeFileOverlays[i] = themeFileOverlays[i].trim();
+				System.out.println("selected ThemeOverlay: " + themeFileOverlays[i]); //$NON-NLS-1$
+			}
+		}
 		
 		preferredLanguage = cmd.getOptionValue("language"); //$NON-NLS-1$
 		if (preferredLanguage != null) {
 			System.out.println("preferred map language set to: " + preferredLanguage); //$NON-NLS-1$
 		}
 		
-		MapsforgeHandler mapsforgeHandler = new MapsforgeHandler(mapFiles, themeFile, themeFileStyle, preferredLanguage);
+		MapsforgeHandler mapsforgeHandler = new MapsforgeHandler(mapFiles, themeFile, themeFileStyle, themeFileOverlays, preferredLanguage);
 
 		Server server = null;
 		String listeningInterface = cmd.getOptionValue("interface"); //$NON-NLS-1$
