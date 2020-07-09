@@ -21,7 +21,7 @@ Whats different to the orign?
 	5. port selection(optional). eg -p 8081
 	6. interface selection(optional) -if [all,localhost]
 	7. language selection(optional) -l EN
-    8. seletable style: -s elmt-hiking
+    8. seletable style: -s elmt-mtb
     9. selectable overlays: -o "elmt-mtbs_tracks,elmt-mtb_routes"
 	
 
