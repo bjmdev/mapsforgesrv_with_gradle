@@ -21,8 +21,9 @@ Whats different to the orign?
 	5. port selection(optional). eg -p 8081
 	6. interface selection(optional) -if [all,localhost]
 	7. language selection(optional) -l EN
-    8. seletable style: -s elmt-mtb
-    9. selectable overlays: -o "elmt-mtbs_tracks,elmt-mtb_routes"
+    8. seletable style (optional): -s elmt-mtb
+    9. selectable overlays (optional): -o "elmt-mtbs_tracks,elmt-mtb_routes"
+    10. selectable renderer (optional): -r [database,direct]
 	
 
 Command parameters:
@@ -35,11 +36,13 @@ Command parameters:
 	5. -l  preffered language if availible in the map file
     6. -s  when using a themefile, selecting the style. eg "elmt-hiking"
     7. -o  when using a themefile and -o is given, ignore overlays enabled inside the themefile. Use only this comma-separated list of overlays.
-    8. -h  print the help text and terminate
+    8. -r  mapsforge renderer [database,direct] (default:database), sometimes "direct" giving better results
+    9. -h  print the help text and terminate
+    
 
 longest example:
 ```console
-C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2mapfile2.map" -t path2themefile.xml -p 8080 -if all -l EN -s "elmt-hiking" "-o elmt-mtbs_tracks,elmt-mtb_routes,elmt-mtb_c_routes"
+C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2mapfile2.map" -t path2themefile.xml -p 8080 -if all -l EN -s "elmt-hiking" -r "direct" -o elmt-mtbs_tracks,elmt-mtb_routes,elmt-mtb_c_routes"
 ```
 
 -------------
@@ -48,5 +51,5 @@ C:\Users\me java -jar path2jarfile\MapsforgeSrv.jar -m "path2mapfile1.map, path2
 - Thomas Th. @telemaxx: converted the mapserver server part in own git project with gradle nature.
 - @pingurus (fixing styleseets error)
 - Bernd @bjmdev (multi map support)
-- @JFritzle (selectable theme style and overlays)
+- @JFritzle (selectable theme style and overlays and renderer)
 
