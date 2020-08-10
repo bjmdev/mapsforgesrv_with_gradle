@@ -54,6 +54,7 @@ import org.mapsforge.map.awt.graphics.AwtGraphicFactory;
 import org.mapsforge.map.awt.graphics.AwtTileBitmap;
 import org.mapsforge.map.datastore.MultiMapDataStore;
 import org.mapsforge.map.layer.renderer.DatabaseRenderer;
+import org.mapsforge.map.layer.renderer.DirectRenderer;
 import org.mapsforge.map.layer.renderer.RendererJob;
 import org.mapsforge.map.layer.labels.TileBasedLabelStore;
 import org.mapsforge.map.model.DisplayModel;
@@ -80,7 +81,8 @@ public class MapsforgeHandler extends AbstractHandler {
 	protected final String[] themeFileOverlays;
 	protected final MultiMapDataStore multiMapDataStore;
 	protected final DisplayModel displayModel;
-	protected DatabaseRenderer renderer;
+	protected DatabaseRenderer databaseRenderer = null;
+	protected DirectRenderer directRenderer = null;
 	protected XmlRenderTheme xmlRenderTheme;
 	protected RenderThemeFuture renderThemeFuture;
 	protected XmlRenderThemeStyleMenu renderThemeStyleMenu;
@@ -90,11 +92,11 @@ public class MapsforgeHandler extends AbstractHandler {
 	private static final Pattern P = Pattern.compile("/(\\d+)/(\\d+)/(\\d+)\\.(.*)"); //$NON-NLS-1$
 
 	
-	public MapsforgeHandler(List<File> mapFiles, File themeFile) throws FileNotFoundException {
-		this(mapFiles, themeFile, (String)null, (String[])null, (String)null);
+	public MapsforgeHandler(String rendererName, List<File> mapFiles, File themeFile) throws FileNotFoundException {
+		this(rendererName, mapFiles, themeFile, (String)null, (String[])null, (String)null);
 	}
 
-	public MapsforgeHandler(List<File> mapFiles, File themeFile, String themeFileStyle, String[] themeFileOverlays, String preferredLanguage) throws FileNotFoundException {
+	public MapsforgeHandler(String rendererName, List<File> mapFiles, File themeFile, String themeFileStyle, String[] themeFileOverlays, String preferredLanguage) throws FileNotFoundException {
 		super();
 		this.mapFiles = mapFiles;
 		this.themeFile = themeFile;
@@ -107,7 +109,12 @@ public class MapsforgeHandler extends AbstractHandler {
 
 		displayModel = new DisplayModel();
 
-		renderer = new DatabaseRenderer(multiMapDataStore, graphicFactory, labelInfoCache, tileBasedLabelStore, true, true, null);
+		if (rendererName.equals("direct")) {
+			directRenderer = new DirectRenderer(multiMapDataStore, graphicFactory, true, null);
+		} else {
+			databaseRenderer = new DatabaseRenderer(multiMapDataStore, graphicFactory, labelInfoCache, tileBasedLabelStore, true, true, null);
+		}
+		
 		renderThemeFuture = new RenderThemeFuture(graphicFactory, xmlRenderTheme, displayModel);
 		XmlRenderThemeMenuCallback callBack = new XmlRenderThemeMenuCallback() {
 
@@ -212,7 +219,7 @@ public class MapsforgeHandler extends AbstractHandler {
 
 		response.setStatus(500);
 
-		if (renderer == null || xmlRenderTheme == null)
+		if ((databaseRenderer == null && directRenderer == null) || xmlRenderTheme == null)
 			return;
 
 		Enumeration<String> paramNames = request.getParameterNames();
@@ -287,8 +294,12 @@ public class MapsforgeHandler extends AbstractHandler {
 		Tile tile = new Tile(x, y, (byte) z, tileRenderSize);
 		job = new RendererJob(tile, multiMapDataStore, renderThemeFuture, displayModel, textScale, transparent, false);
 		synchronized (this) {
-			tileBitmap = (AwtTileBitmap) renderer.executeJob(job);
-			labelInfoCache.put(job, null);
+			if (directRenderer != null) {
+				tileBitmap = (AwtTileBitmap) directRenderer.executeJob(job);
+			} else {
+				tileBitmap = (AwtTileBitmap) databaseRenderer.executeJob(job);
+				labelInfoCache.put(job, null);
+			}
 		}
 		BufferedImage image = AwtGraphicFactory.getBitmap(tileBitmap);
 

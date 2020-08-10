@@ -34,6 +34,7 @@ public class MapsforgeSrv {
 		final String VERSION = "0.13.1"; //starting with 0.13, the mapsforge version //$NON-NLS-1$
 		System.out.println("MapsforgeSrv - a mapsforge tile server. " + "version: " + VERSION); //$NON-NLS-1$ //$NON-NLS-2$
 
+		String rendererName = null;
 		String[] mapFilePaths = null;
 		String themeFilePath = null;
 		String themeFileStyle = null;
@@ -44,6 +45,10 @@ public class MapsforgeSrv {
 		String portNumberString = "" + DEFAULTPORT; //$NON-NLS-1$
 
 		Options options = new Options();
+		
+		Option rendererArgument = new Option("r", "renderer", true, "mapsforge renderer [database,direct] (default: database)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		rendererArgument.setRequired(false);
+		options.addOption(rendererArgument);
 
 		Option mapfileArgument = new Option("m", "mapfiles", true, "comma-separated list of mapsforge map files (.map)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		mapfileArgument.setRequired(true);
@@ -117,6 +122,18 @@ public class MapsforgeSrv {
 			System.out.println("no port given, using " + DEFAULTPORT); //$NON-NLS-1$
 		}
 
+		rendererName = cmd.getOptionValue("renderer"); //$NON-NLS-1$
+		if (rendererName != null) {
+			rendererName = rendererName.trim().toLowerCase();
+			System.out.println("Renderer: " + rendererName); //$NON-NLS-1$
+			if ((!rendererName.equals("database")) && (!rendererName.equals("direct"))) {
+				System.out.println("ERROR: unknown renderer!"); //$NON-NLS-1$
+				System.exit(1);
+			}
+		} else {
+			rendererName = "database";
+		}
+		
 		mapFilePaths = cmd.getOptionValue("mapfiles").trim().split(","); //$NON-NLS-1$ //$NON-NLS-2$
 		ArrayList<File> mapFiles = new ArrayList<>();
 		for (String path : mapFilePaths) {
@@ -166,7 +183,7 @@ public class MapsforgeSrv {
 			System.out.println("preferred map language set to: " + preferredLanguage); //$NON-NLS-1$
 		}
 		
-		MapsforgeHandler mapsforgeHandler = new MapsforgeHandler(mapFiles, themeFile, themeFileStyle, themeFileOverlays, preferredLanguage);
+		MapsforgeHandler mapsforgeHandler = new MapsforgeHandler(rendererName, mapFiles, themeFile, themeFileStyle, themeFileOverlays, preferredLanguage);
 
 		Server server = null;
 		String listeningInterface = cmd.getOptionValue("interface"); //$NON-NLS-1$
